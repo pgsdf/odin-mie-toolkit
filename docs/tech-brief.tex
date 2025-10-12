@@ -1,0 +1,74 @@
+
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, geometry, hyperref}
+\geometry{margin=1in}
+\title{Odin-Mie Technical Brief}
+\author{Vester Thacker}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Overview}
+Odin-Mie implements physically based electromagnetic scattering for homogeneous spheres using Mie theory,
+together with water dielectric models (MW2004, Debye) and TEOS-10 seawater conductivity. It integrates
+over drop size distributions (DSD) to produce radar-observable attenuation $\gamma$ and fits power-law
+relations $\gamma \approx k R^\alpha$.
+
+\section{Mie Theory}
+Define size parameter $x = 2\pi r/\lambda$ and complex refractive index $m=\sqrt{\varepsilon}$.
+The efficiency factors are
+\begin{align}
+Q_{\mathrm{ext}} &= \frac{2}{x^2}\sum_{n=1}^{\infty} (2n+1)\Re(a_n + b_n), \\
+Q_{\mathrm{sca}} &= \frac{2}{x^2}\sum_{n=1}^{\infty} (2n+1)(|a_n|^2 + |b_n|^2), \\
+Q_{\mathrm{back}} &= \frac{1}{x^2}\left|\sum_{n=1}^{\infty} (2n+1)(-1)^n (a_n - b_n)\right|^2.
+\end{align}
+We use Riccati--Bessel recurrences with truncation $n_{\max}\approx x + 4x^{1/3} + 2$.
+
+\section{Dielectric Models}
+We write
+\begin{equation}
+\varepsilon(f,T,S,p) = \varepsilon_{\mathrm{pw}}(f,T) - j \frac{\sigma(S,T,p)}{\varepsilon_0 \omega}, \qquad \omega=2\pi f.
+\end{equation}
+\subsection{MW2004}
+MW2004 supplies $\varepsilon_{\mathrm{pw}}(f,T)$ for pure water using a double-Debye form with temperature-dependent parameters.
+
+\subsection{TEOS-10 Conductivity (PSS-78 + SAL78)}
+Conductivity ratio
+\begin{equation}
+R = \frac{C(S,T,p)}{C(35,15^\circ\mathrm{C},0)}.
+\end{equation}
+At zero pressure, Practical Salinity $S_P$ is obtained from $R_t$ via PSS-78, with temperature polynomial $r_t(T_{68})$.
+For $p>0$, SAL78 uses
+\begin{equation}
+A(X_T), \quad B(X_T), \quad C(X_P)
+\end{equation}
+with $X_T = T_{68}-15$, $X_P=p$ (dbar) and a quadratic solve to recover $R$.
+
+\section{Microphysics and Attenuation}
+With a drop size distribution $N(D)$ and extinction cross section $\sigma_{\mathrm{ext}}(D)$,
+\begin{equation}
+\kappa = \int N(D)\,\sigma_{\mathrm{ext}}(D)\,dD, \qquad \gamma~[\mathrm{dB/km}] = 4.343\times10^3 \kappa.
+\end{equation}
+We provide Marshall--Palmer and Gamma DSDs with Simpson quadrature over drop radius.
+
+\section{Fitting $k,\alpha$}
+Given samples $\{(R_i,\gamma_i)\}$,
+\begin{equation}
+\ln \gamma_i = \ln k + \alpha \ln R_i,
+\end{equation}
+solved by linear least squares in $(\ln R,\ln \gamma)$.
+
+\section{Validation}
+We include unit tests for the TEOS anchor $C(35,15^\circ\mathrm{C},0)=42.9140$~mS/cm and pressure/temperature monotonicity,
+plus validation tables and sweeps.
+
+\section{References}
+\begin{itemize}
+\item Meissner, T., \& Wentz, F. J. (2004). The complex dielectric constant of pure and sea water from microwave satellite observations. \emph{IEEE TGRS}, 42(9), 1836--1849.
+\item UNESCO (1983). Algorithms for computation of fundamental properties of seawater. \emph{Tech. Papers in Marine Science 44}. (SAL78 listing.)
+\item TEOS-10 Manual and GSW Toolbox (v3.06).
+\item Marshall, J. S., \& Palmer, W. McK. (1948). The distribution of raindrops with size. \emph{QJRMS}.
+\end{itemize}
+
+\end{document}
