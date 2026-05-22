@@ -1,6 +1,6 @@
 # Odin-Mie: Electromagnetic Scattering and Attenuation Toolkit
 
-**Author:** Vester Thacker (Pacific Grove Software Distribution Foundation / Nantahala Systems)  
+**Author:** Vester Thacker (Pacific Geoscience Systems Development Foundation)  
 **Language:** Odin  
 **Version:** 1.0 | **Status:** Production
 
@@ -312,6 +312,6 @@ MIT License
 ## Contact
 
 Vester Thacker  
-Pacific Grove Software Distribution Foundation / Nantahala Systems
+Pacific Geoscience Systems Development Foundation 
 
 For technical questions or collaboration inquiries, please use the issue tracker.
